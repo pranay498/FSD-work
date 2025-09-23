@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Expense Tracker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin-top: 30px;
+      color: #333;
+      text-align: center;
+    }
+
+    /* Flex Row Form */
+    .form-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      padding: 20px 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      margin-top: 20px;
+      width: 90%;
+      max-width: 900px;
+    }
+
+    .form-container input {
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      flex: 1 1 150px; /* responsive flex basis */
+      transition: 0.3s;
+    }
+
+    .form-container input:focus {
+      border-color: #4CAF50;
+      outline: none;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    }
+
+    .form-container button {
+      padding: 12px 25px;
+      background: #4CAF50;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .form-container button:hover {
+      background: #45a049;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Table Styling */
+    table {
+      width: 90%;
+      max-width: 900px;
+      margin-top: 30px;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 14px 20px;
+      text-align: center;
+    }
+
+    th {
+      background: #4CAF50;
+      color: white;
+      font-weight: 500;
+    }
+
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    tr:hover {
+      background: #f1f1f1;
+    }
+
+    /* Edit & Delete Buttons */
+    .edit {
+      background: #ffc107;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .edit:hover {
+      background: #e0a800;
+    }
+
+    .delete {
+      background: #f44336;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .delete:hover {
+      background: #d32f2f;
+    }
+
+    @media (max-width: 700px) {
+      .form-container {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .form-container input, .form-container button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Expense Tracker</h1>
+
+  <!-- Flex Row Form -->
+  <div class="form-container">
+    <input type="text" id="name" placeholder="Enter name">
+    <input type="number" id="amount" placeholder="Enter amount">
+    <input type="date" id="date">
+    <input type="time" id="time">
+    <button onclick="addExpense()">Add Expense</button>
+  </div>
+
+  <!-- Expense Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Amount</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="expenseTable"></tbody>
+  </table>
+
+  <script>
+    let expenses = [];
+    let editIndex = -1;
+
+    function addExpense() {
+      const name = document.getElementById("name").value;
+      const amount = document.getElementById("amount").value;
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+
+      if (!name || !amount || !date || !time) {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      const expense = { name, amount, date, time };
+
+      if (editIndex === -1) {
+        expenses.push(expense);
+      } else {
+        expenses[editIndex] = expense;
+        editIndex = -1;
+      }
+
+      clearForm();
+      renderTable();
+    }
+
+    function renderTable() {
+      const table = document.getElementById("expenseTable");
+      table.innerHTML = "";
+      expenses.forEach((exp, index) => {
+        table.innerHTML += `
+          <tr>
+            <td>${exp.name}</td>
+            <td>₹${exp.amount}</td>
+            <td>${exp.date}</td>
+            <td>${exp.time}</td>
+            <td>
+              <button class="edit" onclick="editExpense(${index})">Edit</button>
+              <button class="delete" onclick="deleteExpense(${index})">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function editExpense(index) {
+      const exp = expenses[index];
+      document.getElementById("name").value = exp.name;
+      document.getElementById("amount").value = exp.amount;
+      document.getElementById("date").value = exp.date;
+      document.getElementById("time").value = exp.time;
+      editIndex = index;
+    }
+
+    function deleteExpense(index) {
+      expenses.splice(index, 1);
+      renderTable();
+    }
+
+    function clearForm() {
+      document.getElementById("name").value = "";
+      document.getElementById("amount").value = "";
+      document.getElementById("date").value = "";
+      document.getElementById("time").value = "";
+    }
+  </script>
+</body>
+</html>
